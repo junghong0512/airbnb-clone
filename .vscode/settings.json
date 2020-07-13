@@ -3,5 +3,8 @@
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
   "python.formatting.provider": "black",
-  "python.linting.flake8Args": ["--max-line-length=88"]
+  "python.linting.flake8Args": [
+    "--max-line-length=88"
+  ],
+  "python.pythonPath": "C:\\Users\\jungh\\.virtualenvs\\airbnb-clone-tFHkCJBr\\Scripts\\python.exe"
 }
