@@ -4,4 +4,7 @@
         <li><a href="#">Login</a></li>
         <li><a href="#">Logout</a></li>
     </ul>
+    <form method="get" action="{% url "rooms:search" %}">
+      <input name="city" placeholder="Search by City" />
+    </form>
   </header>
