@@ -17,8 +17,20 @@
     </form>
 
     <h3>Results</h3>
-    {% for room in rooms %}
+    {% for room in rooms.object_list %}
         <h3>{{room.name}}</h3>
     {% endfor %}
+
+    <h5>
+        {% if rooms.has_previous %}
+            <a href="?page={{rooms.number|add:-1}}&{{remains}}">Previous</a>
+        {% endif %}
+
+        Page {{rooms.number}} of {{rooms.paginator.num_pages}}
+
+        {% if rooms.has_next %}
+            <a href="?page={{rooms.number|add:1}}&{{remains}}">Next</a>
+        {% endif %}
+    </h5>
 
 {% endblock content %}

@@ -98,8 +98,14 @@ class SearchView(View):
 
                 rooms = paginator.get_page(page)
 
+                remains = request.get_full_path().split("?")[1]
+                if len(remains.split("page=")) != 1:
+                    remains = remains.split("page=")[1][2:]
+
                 return render(
-                    request, "rooms/search.html", {"form": form, "rooms": rooms}
+                    request,
+                    "rooms/search.html",
+                    {"form": form, "rooms": rooms, "remains": remains},
                 )
 
         else:
