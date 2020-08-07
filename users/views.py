@@ -132,6 +132,7 @@ def github_callback(request):
                             username=email,
                             first_name=name,
                             bio=bio,
+                            email_verified=True,
                             login_method=models.User.LOGIN_GITHUB,
                         )
                         user.set_unusable_password()
@@ -163,8 +164,65 @@ def kakao_callback(request):
     try:
         code = request.GET.get("code")
         client_id = os.environ.get("KAKAO_ID")
+        redirect_uri = "http://127.0.0.1:8000/users/login/kakao/callback"
         token_request = requests.get(
-            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}"
+            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
         )
+        token_json = token_request.json()
+        error = token_json.get("error", None)
+        if error is not None:
+            raise KakaoException()
+        access_token = token_json.get("access_token")
+        profile_request = requests.get(
+            "https://kapi.kakao.com/v2/user/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        profile_json = profile_request.json()
+        kakao_account = profile_json.get("kakao_account")
+        if kakao_account is None:
+            raise KakaoException()
+        email = kakao_account.get("email")
+        profile = kakao_account.get("profile")
+        nickname = profile.get("nickname")
+        profile_image_url = profile.get("profile_image_url")
+        try:
+            user = models.User.objects.get(username=email)
+            if user.login_method != models.User.LOGIN_KAKAO:
+                print("hell0")
+        except models.User.DoesNotExist:
+            models.User.objects.create(
+                email=email,
+                username=email,
+                first_name=nickname,
+                login_method=models.User.LOGIN_KAKAO,
+                email_verified=True,
+            )
+            user.set_unusable_password()
+            user.save()
+        login(request, user)
+        return redirect(reverse("core:home"))
     except KakaoException:
         return redirect(reverse("users:login"))
+
+
+# {
+#     'id': 1444174000,
+#     'connected_at': '2020-08-07T07:23:51Z',
+#     'properties': {'nickname': '정홍'},
+#     'kakao_account':
+#     {
+#         'profile_needs_agreement': False,
+#         'profile': {
+#             'nickname': '정홍',
+#             'thumbnail_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_110x110.jpg',
+#             'profile_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_640x640.jpg'
+#             },
+#         {
+#             'has_email': True,
+#             'email_needs_agreement': False,
+#             'is_email_valid': True,
+#             'is_email_verified': True,
+#         }
+#         'email': 'junghong0512@gmail.com'
+#     }
+# }
