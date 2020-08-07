@@ -4,6 +4,7 @@ from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, reverse
 from django.contrib.auth import authenticate, login, logout
+from django.core.files.base import ContentFile
 from . import forms, models
 
 
@@ -199,30 +200,36 @@ def kakao_callback(request):
             )
             user.set_unusable_password()
             user.save()
+            if profile_image_url is not None:
+                photo_request = requests.get(profile_image_url)
+                user.avatar.save(
+                    f"{nickname}-avatar", ContentFile(photo_request.content)
+                )
+                user.save()
         login(request, user)
         return redirect(reverse("core:home"))
     except KakaoException:
         return redirect(reverse("users:login"))
 
 
-# {
-#     'id': 1444174000,
-#     'connected_at': '2020-08-07T07:23:51Z',
-#     'properties': {'nickname': '정홍'},
-#     'kakao_account':
-#     {
-#         'profile_needs_agreement': False,
-#         'profile': {
-#             'nickname': '정홍',
-#             'thumbnail_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_110x110.jpg',
-#             'profile_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_640x640.jpg'
-#             },
-#         {
-#             'has_email': True,
-#             'email_needs_agreement': False,
-#             'is_email_valid': True,
-#             'is_email_verified': True,
-#         }
-#         'email': 'junghong0512@gmail.com'
-#     }
-# }
+""" {
+    'id': 1444174000,
+    'connected_at': '2020-08-07T07:23:51Z',
+    'properties': {'nickname': '정홍'},
+    'kakao_account':
+    {
+        'profile_needs_agreement': False,
+        'profile': {
+            'nickname': '정홍',
+            'thumbnail_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_110x110.jpg',
+            'profile_image_url': 'http://k.kakaocdn.net/dn/qapYI/btqGnYOYZBg/jKK1QcdjhJqBBq01wRF7M0/img_640x640.jpg'
+            },
+        {
+            'has_email': True,
+            'email_needs_agreement': False,
+            'is_email_valid': True,
+            'is_email_verified': True,
+        }
+        'email': 'junghong0512@gmail.com'
+    }
+} """
