@@ -189,9 +189,9 @@ def kakao_callback(request):
         try:
             user = models.User.objects.get(username=email)
             if user.login_method != models.User.LOGIN_KAKAO:
-                print("hell0")
+                raise KakaoException()
         except models.User.DoesNotExist:
-            models.User.objects.create(
+            user = models.User.objects.create(
                 email=email,
                 username=email,
                 first_name=nickname,
@@ -203,7 +203,7 @@ def kakao_callback(request):
             if profile_image_url is not None:
                 photo_request = requests.get(profile_image_url)
                 user.avatar.save(
-                    f"{nickname}-avatar", ContentFile(photo_request.content)
+                    f"{nickname}-avatar.jpg", ContentFile(photo_request.content)
                 )
                 user.save()
         login(request, user)
