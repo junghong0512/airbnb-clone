@@ -120,6 +120,7 @@ def github_callback(request):
                     name = profile_json.get("name")
                     email = profile_json.get("email")
                     bio = profile_json.get("bio", None)
+                    avatar_url = profile_json.get("avatar_url")
                     if bio is None:
                         bio = f"Hello, This is {name}"
                     try:
@@ -138,6 +139,13 @@ def github_callback(request):
                         )
                         user.set_unusable_password()
                         user.save()
+                        if avatar_url is not None:
+                            photo_request = requests.get(avatar_url)
+                            user.avatar.save(
+                                f"{username}-avatar.jpg",
+                                ContentFile(photo_request.content),
+                            )
+                            user.save()
                     login(request, user)
                     return redirect(reverse("core:home"))
                 else:
