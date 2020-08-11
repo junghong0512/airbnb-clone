@@ -9,13 +9,13 @@
   </head>
   <body class="text-gray-800">
     <header class="container max-w-full flex items-center justify-between px-5 h-20 border-b border-gray-400">
-      <div class="flex items-center">
+      <div class="flex items-center w-1/3">
         <a href="{% url "core:home" %}" class="mr-6">
           <img class="w-8" src="{% static 'img/logo.png' %}" />
         </a>
         {% block search-bar %}
-        <form method="get" action="{% url "rooms:search" %}">
-          <input class="border rounded-md px-2 py-1" name="city" placeholder="Search by City" />
+        <form method="get" action="{% url "rooms:search" %}" class="w-9/12">
+          <input class="search-box border rounded-md w-full shadow-md hover:shadow-lg px-5 py-3 font-medium text-gray-900 placeholder-gray-600 focus:outline-none" name="city" placeholder="Search by City" />
         </form>
         {% endblock search-bar %}
       </div>
