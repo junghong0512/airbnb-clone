@@ -13,7 +13,7 @@ class LoginView(FormView):
     template_name = "users/login.html"
     form_class = forms.LoginForm
     success_url = reverse_lazy("core:home")
-    initial = {"email": "junghong0512@gmail.com"}
+    # initial = {"email": "junghong0512@gmail.com"}
 
     def form_valid(self, form):
         email = form.cleaned_data.get("email")
@@ -49,11 +49,11 @@ class SignUpView(FormView):
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
     success_url = reverse_lazy("core:home")
-    initial = {
-        "first_name": "Jung",
-        "last_name": "Hong",
-        "email": "junghong91@naver.com",
-    }
+    # initial = {
+    #     "first_name": "Jung",
+    #     "last_name": "Hong",
+    #     "email": "junghong91@naver.com",
+    # }
 
     def form_valid(self, form):
         form.save()
