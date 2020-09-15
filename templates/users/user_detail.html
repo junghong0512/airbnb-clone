@@ -24,7 +24,7 @@
         </span>
         
         {% if user == user_obj %}
-            <a href="#" class="btn-link">Edit Profile</a>
+            <a href="{% url 'users:update' %}" class="btn-link">Edit Profile</a>
         {% endif %}
 
     </div>
