@@ -13,7 +13,7 @@
 
         {% include "mixins/auth/auth_form.html" with form=form cta="Update profile" %}
 
-        <div>{{object.login_method}}</div>
+        <div class="my-2">Login Method: {{object.login_method}}</div>
         
         {% if object.login_method == "email" %}
             <div class="mt-5">
