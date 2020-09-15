@@ -7,10 +7,11 @@ from django.shortcuts import redirect, reverse
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
 from django.contrib import messages
-from . import forms, models
+from django.contrib.messages.views import SuccessMessageMixin
+from . import forms, models, mixins
 
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = "users/login.html"
     form_class = forms.LoginForm
@@ -48,7 +49,7 @@ def logout_view(request):
     return redirect(reverse("core:home"))
 
 
-class SignUpView(FormView):
+class SignUpView(mixins.LoggedOutOnlyView, FormView):
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
     success_url = reverse_lazy("core:home")
@@ -259,7 +260,7 @@ class UserProfileViews(DetailView):
     context_object_name = "user_obj"
 
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(SuccessMessageMixin, UpdateView):
 
     model = models.User
     template_name = "users/update-profile.html"
@@ -274,6 +275,8 @@ class UpdateProfileView(UpdateView):
         "currency",
     )
 
+    success_message = "Profile Updated"
+
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -287,9 +290,10 @@ class UpdateProfileView(UpdateView):
         return form
 
 
-class UpdatePasswordView(PasswordChangeView):
+class UpdatePasswordView(SuccessMessageMixin, PasswordChangeView):
 
     template_name = "users/update-password.html"
+    success_message = "Password Updated"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
@@ -299,3 +303,6 @@ class UpdatePasswordView(PasswordChangeView):
             "placeholder": "Confirm new password"
         }
         return form
+
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()
