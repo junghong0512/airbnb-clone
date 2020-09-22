@@ -93,7 +93,12 @@
             {% else %}
                 
                 {% if not request.session.is_hosting %}
-                    {{room.get_calendars}}
+                    {% for calendar in room.get_calendars %}
+                        {{calendar.get_month}}/{{calendar.year}}
+                        {% for day in calendar.day_names %}
+                          {{day}}
+                        {% endfor %}
+                    {% endfor %}
                 {% endif %}
                     
             {% endif %}
