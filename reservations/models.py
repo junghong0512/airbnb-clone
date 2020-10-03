@@ -13,6 +13,9 @@ class BookedDay(core_models.TimeStampedModel):
         verbose_name = "Booked Day"
         verbose_name_plural = "Booked Days"
 
+    def __str__(self):
+        return str(self.day)
+
 
 class Reservation(core_models.TimeStampedModel):
 
@@ -58,20 +61,15 @@ class Reservation(core_models.TimeStampedModel):
     def save(self, *args, **kwargs):
         if self.pk is None:
             start = self.check_in
-            print(start)
             end = self.check_out
-            print(end)
             difference = end - start
             existing_booked_day = BookedDay.objects.filter(
                 day__range=(start, end)
             ).exists()
-            print(existing_booked_day)
             if not existing_booked_day:
                 super().save(*args, **kwargs)
-                print(difference.days + 1)
                 for i in range(difference.days + 1):
                     day = start + datetime.timedelta(days=i)
-                    print(day)
                     BookedDay.objects.create(day=day, reservation=self)
-
+                return
         return super().save(*args, **kwargs)
